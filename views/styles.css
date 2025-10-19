@@ -62,7 +62,8 @@ h1 {
   margin: 20px 0;
   line-height: 1.5;
   opacity: 0;
-  transition: opacity 1s ease-in-out;
+  transition: opacity 2s ease-in-out, transform 0.35s ease-in-out;
+  transform-origin: center center;
 }
 
 #quote-text.show {
@@ -85,6 +86,16 @@ button:hover {
   background: #2980b9;
   color: #fff;
 }
+
+/* keep an accessible focus ring for keyboard users */
+button:focus { outline: 3px solid rgba(41,112,185,0.12); outline-offset: 3px; }
+
+/* Make quote grow slightly when the button is focused/active */
+.card:focus-within #quote-text { transform: scale(1.06); }
+
+/* Clean pressed state: subtle */
+.card.btn-pressed #quote-text { transform: scale(1.08); }
+.card.btn-pressed button { transform: translateY(1px) scale(0.98); background: #ff8c00; color: #fff; }
 
 
 footer {
