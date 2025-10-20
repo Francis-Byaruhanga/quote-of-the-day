@@ -1,12 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quote-Of-the-Day</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="author" content="vivian" />
+    <title>Quote of the Day</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="styles.css">
 </head>
+
 <body>
-    <h1>Quote of the Day</h1>
+    <div class="background">
+        <img id="bg-image" src="https://images.unsplash.com/photo-1503264116251-35a269479413?auto=format&fit=crop&w=1920&q=60" alt="Background Image">
+    </div>
+    <div class="container">
+        <div class="card">
+            <h1><i class="fa-solid fa-quote-left"></i> Quote of the Day</h1>
+            <p id="quote-text" aria-live="polite">Loading quote...</p>
+            <button id="new-quote-btn" aria-label="Get a new quote"><i class="fa-solid fa-rotate"></i> New Quote</button>
+        </div>
+    </div>
+    <footer>
+        <p>✨ Stay inspired every day ✨</p>
+    </footer>
+
+    <script src="scripts.js"></script>
 </body>
+
 </html>

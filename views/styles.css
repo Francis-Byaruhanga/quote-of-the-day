@@ -1,0 +1,117 @@
+body {
+  font-family: 'Noto Sans', sans-serif;
+  color: #fff;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 0;
+  overflow: hidden;
+  transition: background 1s ease-in-out;
+}
+
+/* Background image behind everything */
+.background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  overflow: hidden;
+}
+
+#bg-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.6; /* visible by default */
+  transition: opacity 2s ease-in-out;
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  position: relative;
+  z-index: 1;
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.22); /* slightly stronger for readability */
+  padding: 40px 50px;
+  border-radius: 15px;
+  text-align: center;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 2;
+}
+
+h1 {
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+}
+
+#quote-text {
+  font-size: 1.2rem;
+  font-style: italic;
+  margin: 20px 0;
+  line-height: 1.5;
+  opacity: 0;
+  transition: opacity 2s ease-in-out, transform 0.35s ease-in-out;
+  transform-origin: center center;
+}
+
+#quote-text.show {
+  opacity: 1;
+}
+
+button {
+  background: #fff;
+  color: #2980b9;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: bold;
+  transition: 0.3s;
+}
+
+button:hover {
+  background: #2980b9;
+  color: #fff;
+}
+
+/* keep an accessible focus ring for keyboard users */
+button:focus { outline: 3px solid rgba(41,112,185,0.12); outline-offset: 3px; }
+
+/* Make quote grow slightly when the button is focused/active */
+.card:focus-within #quote-text { transform: scale(1.06); }
+
+/* Clean pressed state: subtle */
+.card.btn-pressed #quote-text { transform: scale(1.08); }
+.card.btn-pressed button { transform: translateY(1px) scale(0.98); background: #ff8c00; color: #fff; }
+
+
+footer {
+  position: relative;
+  bottom: 20px;
+  text-align: center;
+  z-index: 2;
+}
+
+footer p {
+  font-size: 1.3rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+  color: #fff;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.35);
+  margin: 0;
+  opacity: 0.98;
+}
+
