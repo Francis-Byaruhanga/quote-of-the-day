@@ -53,14 +53,17 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Setup Pages
+      # ✅ Proper Pages configuration
+      - name: Setup GitHub Pages
         uses: actions/configure-pages@v4
 
+      # ✅ Upload site files (your `views/` folder contains index.html)
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: './views' # Contains index.html
+          path: './views'
 
+      # ✅ Correct deploy action (typo fixed)
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/dep/loy-pages@v4
+        uses: actions/deploy-pages@v4

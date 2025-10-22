@@ -1,69 +1,85 @@
 /**
  * @jest-environment jsdom
  */
-import fs from "fs";
-import path from "path";
 
-const html = fs.readFileSync(path.resolve(__dirname, "../views/index.html"), "utf8");
+const path = require('path');
 
-describe("Quote of the Day App", () => {
-  let document;
-  let window;
-  let quoteEl;
-  let buttonEl;
-  let imgEl;
+// Mock fetch before importing scripts.js
+global.fetch = jest.fn(() =>
+  Promise.resolve({
+    ok: true,
+    json: () =>
+      Promise.resolve([
+        { quote: 'Test Quote 1', author: 'Tester 1' },
+        { quote: 'Test Quote 2', author: 'Tester 2' },
+      ]),
+  })
+);
 
+// Import scripts.js after defining fetch
+const { rand, showRandom, loadQuotes, quotes } = require(path.resolve(__dirname, '../views/scripts.js'));
+
+// Mock DOM
+document.body.innerHTML = `
+  <div>
+    <p id="quote-text">Loading quote...</p>
+    <button id="new-quote-btn">New Quote</button>
+    <img id="bg-image" />
+  </div>
+`;
+
+describe('Quote of the Day App', () => {
   beforeEach(() => {
-    // Load the HTML into JSDOM
-    document = new DOMParser().parseFromString(html, "text/html");
-    window = document.defaultView;
+    jest.clearAllMocks();
+    document.getElementById('quote-text').textContent = 'Loading quote...';
+    document.getElementById('bg-image').src = '';
+    quotes.splice(0, quotes.length);
+  });
 
-    // Mock DOM elements
-    quoteEl = document.getElementById("quote-text");
-    buttonEl = document.getElementById("new-quote-btn");
-    imgEl = document.getElementById("bg-image");
+  test('rand() returns a random element from an array', () => {
+    const arr = [1, 2, 3, 4];
+    const result = rand(arr);
+    expect(arr).toContain(result);
+  });
 
-    // Mock global fetch
-    global.fetch = jest.fn(() =>
-      Promise.resolve({
-        ok: true,
-        json: () =>
-          Promise.resolve([
-            { quote: "Test quote", author: "Tester" },
-            { quote: "Another quote", author: "Someone" },
-          ]),
-      })
+  test('loadQuotes() fetches from the correct path', async () => {
+    await loadQuotes();
+    expect(global.fetch).toHaveBeenCalledWith('../model/quotes.json');
+  });
+
+  test('showRandom() updates DOM with a new quote and author', () => {
+    quotes.push(
+      { quote: 'Sample Quote', author: 'Author Name' },
+      { quote: 'Another Quote', author: 'Someone Else' }
     );
 
-    // Mock document body
-    global.document = document;
-    global.window = window;
-    global.getComputedStyle = () => ({});
+    const quoteEl = document.getElementById('quote-text');
+    showRandom();
+
+    expect(quoteEl.textContent).toMatch(/—/);
+    expect(quoteEl.textContent).toContain('Quote');
   });
 
-  afterEach(() => {
-    jest.clearAllMocks();
+  test('showRandom() changes background image', () => {
+    const img = document.getElementById('bg-image');
+    const oldSrc = img.src;
+
+    quotes.push({ quote: 'Testing', author: 'Someone' });
+    showRandom();
+
+    expect(img.src).not.toBe(oldSrc);
   });
 
-  test("loads and displays a random quote", async () => {
-    const module = await import("../views/scripts.js");
+  test('loadQuotes() handles fetch errors gracefully', async () => {
+    global.fetch.mockImplementationOnce(() => Promise.resolve({ ok: false }));
+    const consoleSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
-    // Wait for async loadQuotes()
-    await new Promise((resolve) => setTimeout(resolve, 0));
+    await loadQuotes();
 
-    expect(global.fetch).toHaveBeenCalledWith("../model/quotes.json");
-    expect(quoteEl.textContent.length).toBeGreaterThan(0);
-  });
+    const quoteEl = document.getElementById('quote-text');
+    expect(quoteEl.textContent).toBe('Could not load quotes.');
+    expect(consoleSpy).toHaveBeenCalled();
 
-  test("clicking the button changes the quote", async () => {
-    const module = await import("../views/scripts.js");
-    await new Promise((resolve) => setTimeout(resolve, 0));
-
-    const firstQuote = quoteEl.textContent;
-    buttonEl.click();
-    await new Promise((resolve) => setTimeout(resolve, 0));
-
-    const newQuote = quoteEl.textContent;
-    expect(newQuote).not.toEqual(firstQuote);
+    consoleSpy.mockRestore();
   });
 });
