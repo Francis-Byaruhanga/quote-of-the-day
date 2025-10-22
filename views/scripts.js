@@ -26,6 +26,7 @@ function rand(arr) {
 let quotes = [];
 
 // Show random quote + background
+// Show random quote + background
 function showRandom() {
   const q = document.getElementById('quote-text');
   const img = document.getElementById('bg-image');
@@ -42,7 +43,7 @@ function showRandom() {
   const image = rand(localImages);
 
   document.body.style.background = color;
-  if (img) img.src = 'images/' + image;
+  if (img) img.src = `images/${image}`;
 
   q.textContent = `"${item.quote}" — ${item.author}`;
   q.classList.add('show');
@@ -51,33 +52,52 @@ function showRandom() {
 // Load quotes from local JSON file
 async function loadQuotes() {
   const q = document.getElementById('quote-text');
+
   try {
+    // Clear existing quotes
+    quotes = [];
+
     const response = await fetch('../model/quotes.json');
-    if (!response.ok) throw new Error('Failed to load quotes');
-    quotes = await response.json();
-    showRandom(); // Show a random quote after loading
+    if (!response.ok) {
+      throw new Error(`Failed to load quotes: ${response.statusText}`);
+    }
+
+    const quotesData = await response.json();
+    quotes.push(...quotesData);
+
+    // Only show random quote if successfully loaded
+    showRandom();
   } catch (error) {
     console.error('Error loading quotes:', error);
-    if (q) q.textContent = 'Could not load quotes.';
+    if (q) {
+      q.textContent = 'Could not load quotes.';
+    }
   }
 }
 
 // Setup button click after DOM is ready
 function setupButton() {
   const btn = document.getElementById('new-quote-btn');
-  if (btn) btn.addEventListener('click', showRandom);
+  if (btn) {
+    btn.addEventListener('click', () => {
+      loadQuotes().catch(console.error);
+    });
+  }
 }
 
 // Initialize app
-function init() {
+function initializeApp() {
+  if (typeof document === 'undefined') return;
+
+  // Initial load of quotes
+  loadQuotes().catch(console.error);
+
+  // Setup button after quotes start loading
   setupButton();
-  loadQuotes();
 }
 
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', init);
-} else {
-  init();
+if (typeof window !== 'undefined') {
+  document.addEventListener('DOMContentLoaded', initializeApp);
 }
 
 // Export for Jest testing
