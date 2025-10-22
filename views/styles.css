@@ -37,6 +37,7 @@ body {
   width: 100%;
   position: relative;
   z-index: 1;
+  margin-bottom: 80px; 
 }
 
 .card {
@@ -114,4 +115,3 @@ footer p {
   margin: 0;
   opacity: 0.98;
 }
-
