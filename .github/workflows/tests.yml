@@ -25,15 +25,10 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: |
-          if [ -f package-lock.json ]; then
-            npm ci
-          else
-            npm install
-          fi
+        run: npm ci
 
       - name: Run Jest tests
-        run: npm test
+        run: npm test -- --coverage
 
       - name: Upload coverage reports (optional)
         if: ${{ hashFiles('coverage/**') != '' }}
@@ -56,19 +51,16 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: |
-          if [ -f package-lock.json ]; then
-            npm ci
-          else
-            npm install
-          fi
+        run: npm ci
 
-      - name: Run Jest tests before deploy
-        run: npm test
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: './views' # Contains index.html
 
       - name: Deploy to GitHub Pages
-        uses: actions/deploy-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./
-          publish_branch: gh-pages
+        id: deployment
+        uses: actions/dep/loy-pages@v4
