@@ -1,20 +1,7 @@
-// Get references to DOM elements
-const q = document.getElementById('quote-text'); // The quote text paragraph
-const btn = document.getElementById('new-quote-btn'); // The button to get a new quote
-const img = document.getElementById('bg-image'); // The background image element
+// views/scripts.js
 
-// List of quotes to display
-const quotes = [
-  'Life is what happens when you\'re busy making other plans. — John Lennon',
-  'The purpose of our lives is to be happy. — Dalai Lama',
-  'Get busy living or get busy dying. — Stephen King',
-  'You miss 100% of the shots you don\'t take. — Wayne Gretzky'
-];
-
-// List of background colors to randomly choose from
+// Lists for background color and images
 const colors = ['#2980b9', '#8e44ad', '#16a085', '#e67e22', '#c0392b'];
-
-// List of local image filenames for background
 const localImages = [
   'ashutosh-saraswat-CXyz3qljaH8-unsplash.jpg',
   'blake-verdoorn-cssvEZacHvQ-unsplash.jpg',
@@ -30,31 +17,72 @@ const localImages = [
   'zany-jadraque-ZCRtfop2hZY-unsplash.jpg'
 ];
 
-// Helper function: pick a random item from an array
-function rand(a) {
-  return a[Math.floor(Math.random() * a.length)];
+// Helper: pick a random item from array
+function rand(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
 }
 
-// Main function: update quote, background color, and image
+// Quotes array
+let quotes = [];
+
+// Show random quote + background
 function showRandom() {
-  if (!q) return; // Safety check
-  // Remove .show to trigger CSS fade-out (if any)
-  q.classList.remove('show');
-  // Pick a random quote
-  const quote = rand(quotes);
-  // Pick a random background color
-  document.body.style.background = rand(colors);
-  // Pick a random image and set as background
-  if (img) {
-    img.src = 'images/' + rand(localImages);
+  const q = document.getElementById('quote-text');
+  const img = document.getElementById('bg-image');
+
+  if (!q) return;
+
+  if (!quotes.length) {
+    q.textContent = 'Loading quote...';
+    return;
   }
-  // Update the quote text and fade in
-  q.textContent = '"' + quote + '"';
+
+  const item = rand(quotes);
+  const color = rand(colors);
+  const image = rand(localImages);
+
+  document.body.style.background = color;
+  if (img) img.src = 'images/' + image;
+
+  q.textContent = `"${item.quote}" — ${item.author}`;
   q.classList.add('show');
 }
 
-// When the button is clicked, show a new random quote and background
-if (btn) btn.addEventListener('click', showRandom);
+// Load quotes from local JSON file
+async function loadQuotes() {
+  const q = document.getElementById('quote-text');
+  try {
+    const response = await fetch('../model/quotes.json');
+    if (!response.ok) throw new Error('Failed to load quotes');
+    quotes = await response.json();
+    showRandom(); // Show a random quote after loading
+  } catch (error) {
+    console.error('Error loading quotes:', error);
+    if (q) q.textContent = 'Could not load quotes.';
+  }
+}
 
-// Show a random quote and background on page load
-showRandom();
+// Setup button click after DOM is ready
+function setupButton() {
+  const btn = document.getElementById('new-quote-btn');
+  if (btn) btn.addEventListener('click', showRandom);
+}
+
+// Initialize app
+function init() {
+  setupButton();
+  if (process.env.NODE_ENV !== 'test') {
+    loadQuotes();
+  }
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
+
+// Export for Jest testing
+if (typeof module !== 'undefined') {
+  module.exports = { loadQuotes, showRandom, rand, quotes };
+}
