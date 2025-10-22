@@ -33,7 +33,8 @@ describe('Quote of the Day App', () => {
     jest.clearAllMocks();
     document.getElementById('quote-text').textContent = 'Loading quote...';
     document.getElementById('bg-image').src = '';
-    quotes.splice(0, quotes.length);
+   while (quotes.length) quotes.pop();
+
   });
 
   test('rand() returns a random element from an array', () => {
